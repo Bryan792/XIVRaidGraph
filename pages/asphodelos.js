@@ -6,7 +6,9 @@ import 'chartjs-adapter-moment'
 
 import NoSSRWrapper from '../components/no-ssr-wrapper'
 
-import fightsData from '../fights.json'
+import fights from '../fights.json'
+import fights2 from '../fights2.json'
+
 import {
   Chart as ChartJS,
   LinearScale,
@@ -31,18 +33,19 @@ ChartJS.register(
 import { useMemo, useCallback, useEffect, useRef, useState } from 'react'
 
 export default function Home() {
-  const [fights, setFights] = useState([])
+  //Animation
+  //const [fights, setFights] = useState([])
 
-  const timerCallback = useCallback(() => {
-    setFights((fights) => fightsData.slice(0, fights.length + 1))
-  }, [])
-  useEffect(() => {
-    timerRef.current = setInterval(timerCallback, 10)
-    return () => {
-      clearInterval(timerRef.current)
-    }
-  }, [])
-  const timerRef = useRef(0)
+  //const timerCallback = useCallback(() => {
+  //setFights((fights) => fightsData.slice(0, fights.length + 1))
+  //}, [])
+  //useEffect(() => {
+  //timerRef.current = setInterval(timerCallback, 10)
+  //return () => {
+  //clearInterval(timerRef.current)
+  //}
+  //}, [])
+  //const timerRef = useRef(0)
 
   return (
     <NoSSRWrapper>
@@ -50,6 +53,14 @@ export default function Home() {
         <main className={styles.main}>
           <Scatter
             options={{
+              plugins: {
+                legend: {
+                  labels: {
+                    usePointStyle: true,
+                  },
+                },
+              },
+              responsive: true,
               events: ['click'],
               maintainAspectRatio: false,
               scales: {
@@ -111,6 +122,47 @@ export default function Home() {
                     }
                   }),
                   pointBackgroundColor: fights.map((fight) => {
+                    if (fight.kill) return 'gold'
+                    switch (fight.name) {
+                      case 'Erichthonios':
+                        return 'purple'
+                      case 'Hippokampos':
+                        return 'blue'
+                      case 'Phoinix':
+                        return 'red'
+                      case 'Hesperos':
+                        return 'gray'
+                      case 'Hesperos II':
+                        return 'black'
+                    }
+                  }),
+                },
+                {
+                  label: 'PF',
+                  data: fights2.map((fight) => {
+                    let percent = fight.percent
+                    switch (fight.name) {
+                      case 'Hippokampos':
+                        percent += 100
+                        break
+                      case 'Phoinix':
+                        percent += 200
+                        break
+                      case 'Hesperos':
+                        percent = percent * 2 + 300
+                        break
+                      case 'Hesperos II':
+                        percent += 400
+                        break
+                    }
+                    return {
+                      x: fight.date,
+                      y: percent,
+                    }
+                  }),
+                  pointStyle: 'rect',
+                  pointBackgroundColor: fights2.map((fight) => {
+                    if (fight.kill) return 'gold'
                     switch (fight.name) {
                       case 'Erichthonios':
                         return 'purple'
